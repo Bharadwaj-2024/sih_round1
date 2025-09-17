@@ -17,6 +17,7 @@ export function IssueMap({ selectedCategory = "all", selectedStatus = "all", onI
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
+  const isMountedRef = useRef(true)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapView, setMapView] = useState<"satellite" | "street">("street")
 
@@ -73,136 +74,228 @@ export function IssueMap({ selectedCategory = "all", selectedStatus = "all", onI
     const initializeMap = () => {
       if (!mapRef.current || mapInstanceRef.current) return
 
-      const L = (window as any).L
+      try {
+        const L = (window as any).L
+        if (!L) {
+          console.error("Leaflet library not loaded")
+          return
+        }
 
-      const map = L.map(mapRef.current).setView([12.9716, 77.5946], 12)
+        const map = L.map(mapRef.current, {
+          zoomControl: true,
+          attributionControl: true,
+        }).setView([12.9716, 77.5946], 12)
 
-      // Add OpenStreetMap tiles
-      const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      })
+        // Add OpenStreetMap tiles
+        const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+        })
 
-      const satelliteLayer = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: "© Esri",
-        },
-      )
+        const satelliteLayer = L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "© Esri",
+            maxZoom: 19,
+          },
+        )
 
-      streetLayer.addTo(map)
+        streetLayer.addTo(map)
 
-      // Store map instance
-      mapInstanceRef.current = map
+        // Store map instance
+        mapInstanceRef.current = map
 
-      // Store layer references for switching
-      ;(map as any)._streetLayer = streetLayer
-      ;(map as any)._satelliteLayer = satelliteLayer
+        // Store layer references for switching
+        ;(map as any)._streetLayer = streetLayer
+        ;(map as any)._satelliteLayer = satelliteLayer
 
-      setIsMapLoaded(true)
+        // Add error handling for map events
+        map.on('error', (e: any) => {
+          console.warn("Map error:", e)
+        })
+
+        // Only set loaded state if component is still mounted
+        if (isMountedRef.current) {
+          setIsMapLoaded(true)
+        }
+      } catch (error) {
+        console.error("Error initializing map:", error)
+        if (isMountedRef.current) {
+          setIsMapLoaded(false)
+        }
+      }
     }
 
     loadLeaflet()
 
     return () => {
+      isMountedRef.current = false
+
+      // Clean up markers first
+      if (markersRef.current.length > 0) {
+        markersRef.current.forEach((marker) => {
+          try {
+            if (mapInstanceRef.current && marker && mapInstanceRef.current.hasLayer && mapInstanceRef.current.hasLayer(marker)) {
+              mapInstanceRef.current.removeLayer(marker)
+            }
+          } catch (error) {
+            console.warn("Error cleaning up marker:", error)
+          }
+        })
+        markersRef.current = []
+      }
+
+      // Clean up map instance
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove()
-        mapInstanceRef.current = null
+        try {
+          mapInstanceRef.current.remove()
+        } catch (error) {
+          console.warn("Error removing map:", error)
+        } finally {
+          mapInstanceRef.current = null
+        }
       }
     }
   }, [])
 
   useEffect(() => {
-    if (!isMapLoaded || !mapInstanceRef.current) return
+    if (!isMapLoaded || !mapInstanceRef.current || !isMountedRef.current) return
 
     const L = (window as any).L
     const map = mapInstanceRef.current
 
-    // Clear existing markers
-    markersRef.current.forEach((marker) => map.removeLayer(marker))
+    // Additional safety check - ensure map is still valid
+    if (!map || !map.getContainer()) {
+      console.warn("Map instance is invalid, skipping marker update")
+      return
+    }
+
+    // Clear existing markers safely
+    markersRef.current.forEach((marker) => {
+      try {
+        if (map && marker && map.hasLayer && map.hasLayer(marker)) {
+          map.removeLayer(marker)
+        }
+      } catch (error) {
+        console.warn("Error removing marker:", error)
+      }
+    })
     markersRef.current = []
 
     // Add markers for filtered issues
     filteredIssues.forEach((issue) => {
       if (!issue.coordinates) return // Skip issues without coordinates
 
-      const color = getMarkerColor(issue.status, issue.urgency)
-      const icon = getCategoryIcon(issue.category)
+      try {
+        const color = getMarkerColor(issue.status, issue.urgency)
+        const icon = getCategoryIcon(issue.category)
 
-      // Create custom marker
-      const marker = L.circleMarker([issue.coordinates.lat, issue.coordinates.lng], {
-        radius: 8,
-        fillColor: color,
-        color: "#ffffff",
-        weight: 2,
-        opacity: 1,
-        fillOpacity: 0.8,
-      })
+        // Create custom marker
+        const marker = L.circleMarker([issue.coordinates.lat, issue.coordinates.lng], {
+          radius: 8,
+          fillColor: color,
+          color: "#ffffff",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.8,
+        })
 
-      // Add popup with issue details
-      const popupContent = `
-        <div class="p-2 min-w-[200px]">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-lg">${icon}</span>
-            <h3 class="font-semibold text-sm">${issue.title}</h3>
+        // Add popup with issue details
+        const popupContent = `
+          <div class="p-2 min-w-[200px]">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-lg">${icon}</span>
+              <h3 class="font-semibold text-sm">${issue.title}</h3>
+            </div>
+            <p class="text-xs text-gray-600 mb-2">${issue.description}</p>
+            <div class="flex gap-1 mb-2">
+              <span class="px-2 py-1 text-xs rounded ${
+                issue.status === "resolved"
+                  ? "bg-green-100 text-green-800"
+                  : issue.status === "in-progress"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-yellow-100 text-yellow-800"
+              }">${issue.status}</span>
+              <span class="px-2 py-1 text-xs rounded ${
+                issue.urgency === "high"
+                  ? "bg-red-100 text-red-800"
+                  : issue.urgency === "medium"
+                    ? "bg-orange-100 text-orange-800"
+                    : "bg-green-100 text-green-800"
+              }">${issue.urgency}</span>
+            </div>
+            <div class="text-xs text-gray-500">
+              <p>📍 ${issue.location}</p>
+              <p>👍 ${issue.upvotes} upvotes • 💬 ${issue.comments.length} comments</p>
+            </div>
           </div>
-          <p class="text-xs text-gray-600 mb-2">${issue.description}</p>
-          <div class="flex gap-1 mb-2">
-            <span class="px-2 py-1 text-xs rounded ${
-              issue.status === "resolved"
-                ? "bg-green-100 text-green-800"
-                : issue.status === "in-progress"
-                  ? "bg-blue-100 text-blue-800"
-                  : "bg-yellow-100 text-yellow-800"
-            }">${issue.status}</span>
-            <span class="px-2 py-1 text-xs rounded ${
-              issue.urgency === "high"
-                ? "bg-red-100 text-red-800"
-                : issue.urgency === "medium"
-                  ? "bg-orange-100 text-orange-800"
-                  : "bg-green-100 text-green-800"
-            }">${issue.urgency}</span>
-          </div>
-          <div class="text-xs text-gray-500">
-            <p>📍 ${issue.location}</p>
-            <p>👍 ${issue.upvotes} upvotes • 💬 ${issue.comments.length} comments</p>
-          </div>
-        </div>
-      `
+        `
 
-      marker.bindPopup(popupContent)
+        marker.bindPopup(popupContent)
 
-      // Add click handler
-      marker.on("click", () => {
-        if (onIssueSelect) {
-          onIssueSelect(issue.id)
+        // Add click handler
+        marker.on("click", () => {
+          if (onIssueSelect) {
+            onIssueSelect(issue.id)
+          }
+        })
+
+        // Safety check before adding marker to map
+        if (map && map.getContainer()) {
+          marker.addTo(map)
+          markersRef.current.push(marker)
         }
-      })
-
-      marker.addTo(map)
-      markersRef.current.push(marker)
+      } catch (error) {
+        console.warn("Error creating marker for issue:", issue.id, error)
+      }
     })
 
     // Fit map to show all markers if there are any
-    if (markersRef.current.length > 0) {
-      const group = new L.featureGroup(markersRef.current)
-      map.fitBounds(group.getBounds().pad(0.1))
+    if (markersRef.current.length > 0 && map && map.getContainer()) {
+      try {
+        const group = new L.featureGroup(markersRef.current)
+        map.fitBounds(group.getBounds().pad(0.1))
+      } catch (error) {
+        console.warn("Error fitting map bounds:", error)
+      }
     }
   }, [filteredIssues, isMapLoaded, onIssueSelect])
 
   const switchMapView = (view: "satellite" | "street") => {
-    if (!mapInstanceRef.current) return
-
-    const map = mapInstanceRef.current
-
-    if (view === "satellite") {
-      map.removeLayer((map as any)._streetLayer)
-      map.addLayer((map as any)._satelliteLayer)
-    } else {
-      map.removeLayer((map as any)._satelliteLayer)
-      map.addLayer((map as any)._streetLayer)
+    if (!mapInstanceRef.current) {
+      console.warn("Cannot switch map view: map not initialized")
+      return
     }
 
-    setMapView(view)
+    try {
+      const map = mapInstanceRef.current
+
+      // Ensure map is still valid
+      if (!map.getContainer()) {
+        console.warn("Cannot switch map view: map container invalid")
+        return
+      }
+
+      if (view === "satellite") {
+        if ((map as any)._streetLayer && map.hasLayer((map as any)._streetLayer)) {
+          map.removeLayer((map as any)._streetLayer)
+        }
+        if ((map as any)._satelliteLayer) {
+          map.addLayer((map as any)._satelliteLayer)
+        }
+      } else {
+        if ((map as any)._satelliteLayer && map.hasLayer((map as any)._satelliteLayer)) {
+          map.removeLayer((map as any)._satelliteLayer)
+        }
+        if ((map as any)._streetLayer) {
+          map.addLayer((map as any)._streetLayer)
+        }
+      }
+
+      setMapView(view)
+    } catch (error) {
+      console.error("Error switching map view:", error)
+    }
   }
 
   return (
