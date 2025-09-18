@@ -175,10 +175,10 @@ export function CitizenDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="dashboard">{t.dashboard}</TabsTrigger>
             <TabsTrigger value="list" className="flex items-center gap-2">
               <List className="h-4 w-4" />
-              List View
+              {t.listView}
             </TabsTrigger>
             <TabsTrigger value="map" className="flex items-center gap-2">
               <Map className="h-4 w-4" />
@@ -186,7 +186,7 @@ export function CitizenDashboard() {
             </TabsTrigger>
             <TabsTrigger value="community" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              Community
+              {t.community}
             </TabsTrigger>
           </TabsList>
 
@@ -406,7 +406,7 @@ export function CitizenDashboard() {
                     <div className="flex items-center gap-4">
                       <span>{issue.upvotes} upvotes</span>
                       <span>{issue.comments.length} comments</span>
-                      <span>{issue.createdAt}</span>
+                      <span>{issue.reportedAt}</span>
                     </div>
                   </div>
                   <div className="mt-3 flex gap-2">

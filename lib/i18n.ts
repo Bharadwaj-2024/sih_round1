@@ -11,7 +11,8 @@ export interface Translations {
   close: string
   search: string
   filter: string
-
+  all: string
+  
   // Authentication
   signIn: string
   signOut: string
@@ -27,7 +28,9 @@ export interface Translations {
   overview: string
   issues: string
   mapView: string
+  listView: string
   analytics: string
+  community: string
 
   // Issue Management
   reportNewIssue: string
@@ -68,6 +71,15 @@ export interface Translations {
   welcomeMessage: string
   noIssuesFound: string
   issueReportedSuccessfully: string
+  
+  // Community
+  communities: string
+  joinCommunity: string
+  leaveCommunity: string
+  createCommunity: string
+  discussions: string
+  members: string
+  trending: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -82,6 +94,7 @@ export const translations: Record<Language, Translations> = {
     close: "Close",
     search: "Search",
     filter: "Filter",
+    all: "All",
 
     // Authentication
     signIn: "Sign In",
@@ -98,7 +111,9 @@ export const translations: Record<Language, Translations> = {
     overview: "Overview",
     issues: "Issues",
     mapView: "Map View",
+    listView: "List View",
     analytics: "Analytics",
+    community: "Community",
 
     // Issue Management
     reportNewIssue: "Report New Issue",
@@ -139,6 +154,15 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "Welcome to CivicConnect",
     noIssuesFound: "No issues found matching your criteria",
     issueReportedSuccessfully: "Issue reported successfully! You will receive updates on its status.",
+    
+    // Community
+    communities: "Communities",
+    joinCommunity: "Join Community",
+    leaveCommunity: "Leave Community",
+    createCommunity: "Create Community",
+    discussions: "Discussions",
+    members: "Members",
+    trending: "Trending",
   },
 
   hi: {
@@ -168,6 +192,7 @@ export const translations: Record<Language, Translations> = {
     overview: "अवलोकन",
     issues: "समस्याएं",
     mapView: "मैप व्यू",
+    listView: "सूची दृश्य",
     analytics: "विश्लेषण",
 
     // Issue Management
@@ -209,6 +234,17 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "CivicConnect में आपका स्वागत है",
     noIssuesFound: "आपके मानदंडों से मेल खाने वाली कोई समस्या नहीं मिली",
     issueReportedSuccessfully: "समस्या सफलतापूर्वक रिपोर्ट की गई! आपको इसकी स्थिति पर अपडेट मिलेंगे।",
+    
+    // Community
+    all: "सभी",
+    community: "समुदाय",
+    communities: "समुदाय",
+    joinCommunity: "समुदाय में शामिल हों",
+    leaveCommunity: "समुदाय छोड़ें",
+    createCommunity: "समुदाय बनाएं",
+    discussions: "चर्चा",
+    members: "सदस्य",
+    trending: "ट्रेंडिंग",
   },
 
   ta: {
@@ -238,6 +274,7 @@ export const translations: Record<Language, Translations> = {
     overview: "கண்ணோட்டம்",
     issues: "பிரச்சினைகள்",
     mapView: "வரைபட காட்சி",
+    listView: "பட்டியல் காட்சி",
     analytics: "பகுப்பாய்வு",
 
     // Issue Management
@@ -279,6 +316,17 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "CivicConnect க்கு வரவேற்கிறோம்",
     noIssuesFound: "உங்கள் அளவுகோல்களுக்கு பொருந்தும் பிரச்சினைகள் எதுவும் கிடைக்கவில்லை",
     issueReportedSuccessfully: "பிரச்சினை வெற்றிகரமாக புகாரளிக்கப்பட்டது! அதன் நிலை குறித்த புதுப்பிப்புகளை நீங்கள் பெறுவீர்கள்.",
+    
+    // Community
+    all: "அனைத்தும்",
+    community: "சமூகம்",
+    communities: "சமூகங்கள்",
+    joinCommunity: "சமூகத்தில் சேரவும்",
+    leaveCommunity: "சமூகத்தை விட்டு வெளியேறவும்",
+    createCommunity: "சமூகத்தை உருவாக்கவும்",
+    discussions: "விவாதங்கள்",
+    members: "உறுப்பினர்கள்",
+    trending: "பிரபலமாகும்",
   },
 
   te: {
@@ -308,6 +356,7 @@ export const translations: Record<Language, Translations> = {
     overview: "అవలోకనం",
     issues: "సమస్యలు",
     mapView: "మ్యాప్ వ్యూ",
+    listView: "జాబితా వీక్షణ",
     analytics: "విశ్లేషణలు",
 
     // Issue Management
@@ -349,6 +398,17 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "CivicConnect కు స్వాగతం",
     noIssuesFound: "మీ ప్రమాణాలకు సరిపోలే సమస్యలు ఏవీ కనుగొనబడలేదు",
     issueReportedSuccessfully: "సమస్య విజయవంతంగా నివేదించబడింది! దాని స్థితిపై మీకు అప్‌డేట్‌లు అందుతాయి.",
+    
+    // Community
+    all: "అన్నీ",
+    community: "సమాజం",
+    communities: "సమాజాలు",
+    joinCommunity: "కమ్యూనిటీలో చేరండి",
+    leaveCommunity: "కమ్యూనిటీని వదిలివేయండి",
+    createCommunity: "కమ్యూనిటీని సృష్టించండి",
+    discussions: "చర్చలు",
+    members: "సభ్యులు",
+    trending: "ట్రెండింగ్",
   },
 
   kn: {
@@ -378,6 +438,7 @@ export const translations: Record<Language, Translations> = {
     overview: "ಅವಲೋಕನ",
     issues: "ಸಮಸ್ಯೆಗಳು",
     mapView: "ನಕ್ಷೆ ವೀಕ್ಷಣೆ",
+    listView: "ಪಟ್ಟಿ ವೀಕ್ಷಣೆ",
     analytics: "ವಿಶ್ಲೇಷಣೆ",
 
     // Issue Management
@@ -419,6 +480,17 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "CivicConnect ಗೆ ಸ್ವಾಗತ",
     noIssuesFound: "ನಿಮ್ಮ ಮಾನದಣ್ಡಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುವ ಯಾವುದೇ ಸಮಸ್ಯೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
     issueReportedSuccessfully: "ಸಮಸ್ಯೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ವರದಿ ಮಾಡಲಾಗಿದೆ! ಅದರ ಸ್ಥಿತಿಯ ಕುರಿತು ನೀವು ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ಸ್ವೀಕರಿಸುತ್ತೀರಿ.",
+    
+    // Community
+    all: "ಎಲ್ಲಾ",
+    community: "ಸಮುದಾಯ",
+    communities: "ಸಮುದಾಯಗಳು",
+    joinCommunity: "ಸಮುದಾಯಕ್ಕೆ ಸೇರಿ",
+    leaveCommunity: "ಸಮುದಾಯವನ್ನು ಬಿಟ್ಟುಬಿಡಿ",
+    createCommunity: "ಸಮುದಾಯವನ್ನು ರಚಿಸಿ",
+    discussions: "ಚರ್ಚೆಗಳು",
+    members: "ಸದಸ್ಯರು",
+    trending: "ಟ್ರೆಂಡಿಂಗ್",
   },
 
   mr: {
@@ -448,6 +520,7 @@ export const translations: Record<Language, Translations> = {
     overview: "विहंगावलोकन",
     issues: "समस्या",
     mapView: "नकाशा दृश्य",
+    listView: "यादी दृश्य",
     analytics: "विश्लेषण",
 
     // Issue Management
@@ -489,6 +562,17 @@ export const translations: Record<Language, Translations> = {
     welcomeMessage: "CivicConnect मध्ये आपले स्वागत आहे",
     noIssuesFound: "आपल्या निकषांशी जुळणाऱ्या कोणत्याही समस्या आढळल्या नाहीत",
     issueReportedSuccessfully: "समस्या यशस्वीरित्या नोंदवली गेली! त्याच्या स्थितीबद्दल तुम्हाला अपडेट्स मिळतील.",
+    
+    // Community
+    all: "सर्व",
+    community: "समुदाय",
+    communities: "समुदाय",
+    joinCommunity: "समुदायात सामील व्हा",
+    leaveCommunity: "समुदाय सोडा",
+    createCommunity: "समुदाय तयार करा",
+    discussions: "चर्चा",
+    members: "सदस्य",
+    trending: "ट्रेंडिंग",
   },
 }
 

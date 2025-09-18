@@ -7,29 +7,57 @@ interface LanguageContextType {
   language: Language
   setLanguage: (lang: Language) => void
   t: Translations
+  isLoaded: boolean
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en")
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    // Check for stored language preference
-    const storedLanguage = localStorage.getItem("civicconnect_language") as Language
-    if (storedLanguage && translations[storedLanguage]) {
-      setLanguageState(storedLanguage)
+    // Check if we're in the browser environment
+    if (typeof window !== "undefined") {
+      try {
+        // Check for stored language preference
+        const storedLanguage = localStorage.getItem("civicconnect_language") as Language
+        if (storedLanguage && translations[storedLanguage]) {
+          setLanguageState(storedLanguage)
+        }
+      } catch (error) {
+        console.warn("Error accessing localStorage for language preference:", error)
+      }
+      setIsLoaded(true)
     }
   }, [])
 
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang)
-    localStorage.setItem("civicconnect_language", lang)
+    if (translations[lang]) {
+      setLanguageState(lang)
+      // Only access localStorage if we're in the browser
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("civicconnect_language", lang)
+        } catch (error) {
+          console.warn("Error saving language preference to localStorage:", error)
+        }
+      }
+    } else {
+      console.warn(`Language "${lang}" is not supported`)
+    }
   }
 
   const t = translations[language]
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>
+  const value = {
+    language,
+    setLanguage,
+    t,
+    isLoaded
+  }
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
 
 export function useLanguage() {
